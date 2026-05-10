@@ -1,6 +1,6 @@
 # WebADB - 浏览器端 Android 调试工具
 
-> 无需安装任何软件，通过 USB 在浏览器中调试 Android 设备
+> 无需安装任何软件，通过 USB 或 WiFi 在浏览器中调试 Android 设备
 
 ## 🎯 功能特性
 
@@ -12,64 +12,119 @@
 | 🖥️ 设备信息 | 查看设备硬件/系统信息 | ✅ |
 | 🎬 屏幕投射 | 实时查看设备屏幕 | 🔄 |
 | 📋 Logcat | 查看设备日志 | ✅ |
+| 📡 网络调试 | ADB 无线配对 + 连接 | ✅ 新增 |
+
+## 📡 网络调试（新增）
+
+支持 Android 11+ 的无线调试功能：
+
+### 两种模式
+
+| 模式 | 说明 | 用途 |
+|------|------|------|
+| 📶 **无线配对** | 输入 IP + 配对端口 + 配对码 | 首次连接新设备 |
+| 🔗 **直接连接** | 输入 IP + 连接端口 | 连接已配对设备 |
+
+### 使用步骤
+
+#### 1. 启动 ADB Bridge 代理
+
+```bash
+# 安装依赖（零依赖，只需 Node.js）
+# 无需 npm install！
+
+# 启动 Bridge
+node bridge.js --port=15555
+```
+
+#### 2. 手机端操作
+
+1. 打开 **设置** → **开发者选项** → **无线调试**
+2. 开启 **无线调试**
+3. 点击 **使用配对码配对设备**
+4. 记下 **配对码** 和 **配对端口**
+
+#### 3. 浏览器端操作
+
+1. 打开 [WebADB](https://0tah-mitos.github.io/webadb/)
+2. 点击左侧 **网络调试**
+3. 在 **无线配对** 标签页输入：
+   - 设备 IP 地址
+   - 配对端口（不是连接端口！）
+   - 6 位配对码
+4. 点击 **配对**
+5. 配对成功后，切换到 **连接设备** 标签页
+6. 输入 **连接端口**（在手机无线调试页面显示）
+7. 点击 **连接**
+
+> ⚠️ **配对端口和连接端口不同！** 配对端口是临时的，连接端口是固定的。
 
 ## 🔧 技术栈
 
 - **WebUSB API** - 浏览器直接访问 USB 设备
+- **WebSocket** - 网络调试通信
 - **ADB Protocol** - 纯 JavaScript 实现 ADB 协议
-- **Zero Dependencies** - 无需安装任何依赖
+- **Zero Dependencies** - 前端零依赖，Bridge 零依赖
 - **Single HTML** - 单文件部署到 GitHub Pages
-
-## 🚀 使用方法
-
-### 前提条件
-1. **Chrome / Edge 浏览器**（需要 WebUSB 支持）
-2. **Android 设备**开启 USB 调试
-3. **USB 数据线**连接设备和电脑
-
-### 步骤
-1. 打开 [WebADB](https://0tah-mitos.github.io/webadb/)
-2. 点击 **连接设备** 按钮
-3. 在弹出的设备选择器中选择你的 Android 设备
-4. 在手机上点击 **允许 USB 调试**
-5. 开始使用！
-
-### 开启 USB 调试
-1. 打开 **设置** → **关于手机**
-2. 连续点击 **版本号** 7 次（开启开发者模式）
-3. 返回 **设置** → **开发者选项**
-4. 开启 **USB 调试**
 
 ## 🏗️ 项目结构
 
 ```
 webadb/
 ├── index.html    # 完整的 WebADB 应用（单文件）
+├── bridge.js    # ADB Bridge 代理服务器（Node.js，零依赖）
 └── README.md     # 项目说明
+```
+
+## 🔌 ADB Bridge 协议
+
+浏览器通过 WebSocket (`ws://localhost:15555/adb`) 与 Bridge 通信：
+
+### 配对
+
+```json
+→ { "action": "pair", "ip": "192.168.1.100", "port": 37653, "code": "123456" }
+← { "type": "pair_result", "success": true, "ip": "192.168.1.100", "port": 37653 }
+```
+
+### 连接
+
+```json
+→ { "action": "connect", "ip": "192.168.1.100", "port": 5555 }
+← { "type": "connect_result", "success": true, "ip": "192.168.1.100", "port": 5555 }
+```
+
+### Shell 命令
+
+```json
+→ { "action": "shell", "command": "getprop ro.product.model" }
+← { "type": "shell_output", "command": "getprop ro.product.model", "output": "Pixel 7" }
+```
+
+### 断开连接
+
+```json
+→ { "action": "disconnect", "ip": "192.168.1.100", "port": 5555 }
+← { "type": "disconnect_result", "success": true }
+```
+
+### 列出设备
+
+```json
+→ { "action": "devices" }
+← { "type": "device_list", "devices": [...] }
 ```
 
 ## 🔐 安全说明
 
-- 所有数据传输都在**本地 USB 连接**中进行
-- **不会上传任何数据**到服务器
-- 基于 WebUSB API，浏览器沙盒隔离
+- 所有数据传输都在**本地 USB/WiFi 连接**中进行
+- Bridge 仅监听 `localhost`，**不对外暴露**
+- **不会上传任何数据**到远程服务器
 - 代码开源透明，可自行审查
-
-## 🛠️ ADB 协议实现
-
-本项目在 JavaScript 中实现了 ADB 协议的核心消息类型：
-
-| 消息类型 | 代码 | 说明 |
-|----------|------|------|
-| `CNXN` | `0x4e584e43` | 连接请求 |
-| `OPEN` | `0x4e45504f` | 打开流 |
-| `OKAY` | `0x59414b4f` | 确认 |
-| `CLSE` | `0x45534c43` | 关闭流 |
-| `WRTE` | `0x45545257` | 写入数据 |
-| `AUTH` | `0x48545541` | 认证 |
 
 ## 📚 参考资料
 
+- [Android Wireless Debugging](https://developer.android.com/studio/command-line/adb#connect-to-a-device-over-wi-fi)
 - [Android ADB Protocol](https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/master/protocol.txt)
 - [WebUSB API](https://developer.mozilla.org/en-US/docs/Web/API/WebUSB_API)
 - [ya-webadb](https://github.com/yume-chan/ya-webadb) - 参考 ADB 协议实现
