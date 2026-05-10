@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebADB - 浏览器端 Android 调试工具</title>
+  <style>
+    :root {
+      --bg: #0f0f1a;
+      --surface: #1a1a2e;
+      --surface2: #222240;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --text: #e0e0e0;
+      --text2: #888;
+      --danger: #ff4757;
+      --success: #2ed573;
+      --warning: #ffa502;
+      --border: #333366;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      background: var(--accent);
+      border-radius: 20px;
+      color: white;
+      font-weight: 600;
+    }
+
+    .connect-btn {
+      padding: 10px 24px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      border: none;
+      border-radius: var(--radius);
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .connect-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+    }
+
+    .connect-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .status-dot.connected { background: var(--success); box-shadow: 0 0 8px var(--success); }
+    .status-dot.disconnected { background: var(--danger); }
+    .status-dot.connecting { background: var(--warning); animation: pulse 1s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Main Layout */
+    .main {
+      display: flex;
+      height: calc(100vh - 108px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 12px 0;
+      flex-shrink: 0;
+    }
+
+    .sidebar-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text2);
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-item:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .sidebar-item.active {
+      background: var(--surface2);
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+
+    .sidebar-icon {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    /* Welcome */
+    .welcome {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .welcome h2 {
+      font-size: 28px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .welcome p {
+      color: var(--text2);
+      font-size: 16px;
+      line-height: 1.8;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .feature-card .icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .feature-card h3 {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .feature-card p {
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    /* Terminal */
+    .terminal-container {
+      background: #0d0d0d;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .terminal-header {
+      background: var(--surface2);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .terminal-output {
+      flex: 1;
+      padding: 16px;
+      font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .terminal-output .cmd { color: var(--accent2); }
+    .terminal-output .output { color: var(--text); }
+    .terminal-output .error { color: var(--danger); }
+    .terminal-output .info { color: var(--accent); }
+
+    .terminal-input-line {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      border-top: 1px solid var(--border);
+      background: #0d0d0d;
+    }
+
+    .terminal-prompt {
+      color: var(--accent2);
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    .terminal-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      outline: none;
+    }
+
+    /* Device Info */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .info-card h3 {
+      font-size: 14px;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .info-row:last-child { border-bottom: none; }
+
+    .info-label { color: var(--text2); }
+    .info-value { color: var(--text); font-weight: 500; }
+
+    /* File Manager */
+    .file-toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    .file-toolbar button {
+      padding: 8px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .file-toolbar button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .file-path {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    .file-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 13px;
+    }
+
+    .file-item:hover { background: var(--surface2); }
+    .file-item:last-child { border-bottom: none; }
+
+    .file-icon { margin-right: 10px; font-size: 16px; }
+    .file-name { flex: 1; }
+    .file-size { color: var(--text2); margin-right: 20px; }
+    .file-perm { color: var(--text2); font-family: monospace; font-size: 11px; }
+
+    /* Scrcpy / Screen */
+    .screen-container {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .screen-frame {
+      display: inline-block;
+      border: 3px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+    }
+
+    .screen-frame canvas {
+      display: block;
+    }
+
+    .screen-placeholder {
+      width: 360px;
+      height: 640px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text2);
+      font-size: 14px;
+    }
+
+    .screen-placeholder .icon { font-size: 48px; margin-bottom: 16px; }
+
+    /* App Manager */
+    .app-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .app-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .app-item:hover { background: var(--surface2); }
+
+    .app-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 16px;
+    }
+
+    .app-name { flex: 1; }
+    .app-package { color: var(--text2); font-family: monospace; font-size: 11px; }
+    .app-action {
+      padding: 4px 12px;
+      background: var(--danger);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 11px;
+      cursor: pointer;
+      opacity: 0.8;
+    }
+
+    .app-action:hover { opacity: 1; }
+
+    /* Logcat */
+    .logcat-filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .logcat-filter {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      transition: all 0.2s;
+    }
+
+    .logcat-filter.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(108, 99, 255, 0.1);
+    }
+
+    .logcat-output {
+      background: #0d0d0d;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      height: calc(100vh - 280px);
+      overflow-y: auto;
+    }
+
+    .log-verbose { color: #888; }
+    .log-debug { color: #4fc3f7; }
+    .log-info { color: #66bb6a; }
+    .log-warn { color: #ffa726; }
+    .log-error { color: #ef5350; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; }
+      .sidebar-item span { display: none; }
+      .sidebar-item { justify-content: center; padding: 12px; }
+      .main { flex-direction: column; }
+      .content { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">WebADB</div>
+      <span class="header-badge">v1.0</span>
+    </div>
+    <button class="connect-btn" id="connectBtn" onclick="connectDevice()">
+      <span>&#128268;</span>
+      <span id="connectText">连接设备</span>
+    </button>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-dot disconnected" id="statusDot"></span>
+    <span id="statusText">未连接</span>
+    <span style="margin-left: auto; color: var(--text2);">
+      WebUSB + ADB Protocol | Powered by 0tah-mitos
+    </span>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-item active" onclick="switchPanel('welcome')" data-panel="welcome">
+        <span class="sidebar-icon">&#127968;</span>
+        <span>首页</span>
+      </div>
+      <div class="sidebar-item" onclick="switchPanel('device')" data-panel="device">
+        <span class="sidebar-icon">&#128241;</span>
+        <span>设备信息</span>
+      </div>
+      <div class="sidebar-item" onclick="switchPanel('terminal')" data-panel="terminal">
+        <span class="sidebar-icon">&#128187;</span>
+        <span>终端</span>
+      </div>
+      <div class="sidebar-item" onclick="switchPanel('files')" data-panel="files">
+        <span class="sidebar-icon">&#128193;</span>
+        <span>文件管理</span>
+      </div>
+      <div class="sidebar-item" onclick="switchPanel('apps')" data-panel="apps">
+        <span class="sidebar-icon">&#128241;</span>
+        <span>应用管理</span>
+      </div>
+      <div class="sidebar-item" onclick="switchPanel('screen')" data-panel="screen">
+        <span class="sidebar-icon">&#127909;</span>
+        <span>屏幕投射</span>
+      </div>
+      <div class="sidebar-item" onclick="switchPanel('logcat')" data-panel="logcat">
+        <span class="sidebar-icon">&#128220;</span>
+        <span>日志</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Welcome Panel -->
+      <div class="panel active" id="panel-welcome">
+        <div class="welcome">
+          <h2>WebADB - 浏览器端 Android 调试工具</h2>
+          <p>无需安装任何软件，通过 USB 连接 Android 设备，直接在浏览器中执行 ADB 操作。</p>
+          <p style="margin-top: 8px; color: var(--accent);">基于 WebUSB API 实现，支持 Chrome / Edge 浏览器</p>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <div class="icon">&#128187;</div>
+              <h3>Shell 终端</h3>
+              <p>远程执行 shell 命令</p>
+            </div>
+            <div class="feature-card">
+              <div class="icon">&#128193;</div>
+              <h3>文件管理</h3>
+              <p>浏览和传输文件</p>
+            </div>
+            <div class="feature-card">
+              <div class="icon">&#128241;</div>
+              <h3>应用管理</h3>
+              <p>安装/卸载应用</p>
+            </div>
+            <div class="feature-card">
+              <div class="icon">&#127909;</div>
+              <h3>屏幕投射</h3>
+              <p>实时查看设备屏幕</p>
+            </div>
+          </div>
+          <div style="margin-top: 40px;">
+            <button class="connect-btn" onclick="connectDevice()" style="font-size: 16px; padding: 14px 32px;">
+              <span>&#128268;</span>
+              连接 Android 设备
+            </button>
+            <p style="margin-top: 12px; font-size: 12px; color: var(--text2);">
+              请确保手机已开启 USB 调试模式，并通过 USB 连接到电脑
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Info Panel -->
+      <div class="panel" id="panel-device">
+        <h2 style="margin-bottom: 20px;">&#128241; 设备信息</h2>
+        <div class="info-grid" id="deviceInfo">
+          <div class="info-card">
+            <h3>&#9881; 基本信息</h3>
+            <div class="info-row"><span class="info-label">设备型号</span><span class="info-value" id="devModel">-</span></div>
+            <div class="info-row"><span class="info-label">Android 版本</span><span class="info-value" id="devAndroid">-</span></div>
+            <div class="info-row"><span class="info-label">SDK 版本</span><span class="info-value" id="devSDK">-</span></div>
+            <div class="info-row"><span class="info-label">安全补丁</span><span class="info-value" id="devSecurity">-</span></div>
+          </div>
+          <div class="info-card">
+            <h3>&#128421; 硬件信息</h3>
+            <div class="info-row"><span class="info-label">CPU 架构</span><span class="info-value" id="devCPU">-</span></div>
+            <div class="info-row"><span class="info-label">屏幕分辨率</span><span class="info-value" id="devScreen">-</span></div>
+            <div class="info-row"><span class="info-label">内存</span><span class="info-value" id="devMem">-</span></div>
+            <div class="info-row"><span class="info-label">电池</span><span class="info-value" id="devBattery">-</span></div>
+          </div>
+          <div class="info-card">
+            <h3>&#128274; 系统信息</h3>
+            <div class="info-row"><span class="info-label">Build ID</span><span class="info-value" id="devBuild">-</span></div>
+            <div class="info-row"><span class="info-label">序列号</span><span class="info-value" id="devSerial">-</span></div>
+            <div class="info-row"><span class="info-label">Root</span><span class="info-value" id="devRoot">-</span></div>
+            <div class="info-row"><span class="info-label">SELinux</span><span class="info-value" id="devSELinux">-</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terminal Panel -->
+      <div class="panel" id="panel-terminal">
+        <div class="terminal-container">
+          <div class="terminal-header">
+            <span class="terminal-dot" style="background: #ff5f57;"></span>
+            <span class="terminal-dot" style="background: #ffbd2e;"></span>
+            <span class="terminal-dot" style="background: #28c840;"></span>
+            <span style="margin-left: 8px;">ADB Shell</span>
+          </div>
+          <div class="terminal-output" id="terminalOutput">
+<span class="info">WebADB Terminal v1.0</span>
+<span class="info">请先连接 Android 设备，然后输入命令</span>
+
+</div>
+          <div class="terminal-input-line">
+            <span class="terminal-prompt">$</span>
+            <input class="terminal-input" id="terminalInput" placeholder="输入 shell 命令..." onkeydown="handleTerminal(event)" autofocus>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Manager Panel -->
+      <div class="panel" id="panel-files">
+        <h2 style="margin-bottom: 20px;">&#128193; 文件管理</h2>
+        <div class="file-toolbar">
+          <button onclick="fileNavigateUp()">&#128284; 上级</button>
+          <button onclick="fileRefresh()">&#128260; 刷新</button>
+          <button onclick="fileUpload()">&#128228; 上传</button>
+          <input class="file-path" id="filePath" value="/sdcard/" readonly>
+        </div>
+        <div class="file-list" id="fileList">
+          <div class="file-item" style="color: var(--text2); justify-content: center;">
+            连接设备后可浏览文件
+          </div>
+        </div>
+      </div>
+
+      <!-- App Manager Panel -->
+      <div class="panel" id="panel-apps">
+        <h2 style="margin-bottom: 20px;">&#128241; 应用管理</h2>
+        <div class="file-toolbar">
+          <button onclick="refreshApps()">&#128260; 刷新</button>
+          <button onclick="installAPK()">&#128228; 安装 APK</button>
+          <input class="file-path" id="appFilter" placeholder="搜索应用..." oninput="filterApps()">
+        </div>
+        <div class="app-list" id="appList">
+          <div class="app-item" style="color: var(--text2); justify-content: center; padding: 20px;">
+            连接设备后可管理应用
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen Panel -->
+      <div class="panel" id="panel-screen">
+        <h2 style="margin-bottom: 20px;">&#127909; 屏幕投射</h2>
+        <div class="screen-container">
+          <div class="screen-frame">
+            <div class="screen-placeholder" id="screenPlaceholder">
+              <div class="icon">&#128241;</div>
+              <p>连接设备后可查看屏幕</p>
+              <button class="connect-btn" onclick="startScrcpy()" style="margin-top: 16px; font-size: 13px;">
+                开始投射
+              </button>
+            </div>
+            <canvas id="screenCanvas" style="display: none;"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logcat Panel -->
+      <div class="panel" id="panel-logcat">
+        <h2 style="margin-bottom: 20px;">&#128220; Logcat 日志</h2>
+        <div class="logcat-filters">
+          <span class="logcat-filter active" onclick="setLogFilter('all', this)">全部</span>
+          <span class="logcat-filter" onclick="setLogFilter('verbose', this)">Verbose</span>
+          <span class="logcat-filter" onclick="setLogFilter('debug', this)">Debug</span>
+          <span class="logcat-filter" onclick="setLogFilter('info', this)">Info</span>
+          <span class="logcat-filter" onclick="setLogFilter('warn', this)">Warn</span>
+          <span class="logcat-filter" onclick="setLogFilter('error', this)">Error</span>
+        </div>
+        <div class="logcat-output" id="logcatOutput">
+<span class="log-info">--- 连接设备后开始捕获日志 ---</span>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // WebADB - Core ADB Implementation
+    // ==========================================
+
+    let device = null;
+    let connection = null;
+    let isConnected = false;
+    let currentPath = '/sdcard/';
+    let commandHistory = [];
+    let historyIndex = -1;
+
+    // ---- ADB Protocol Constants ----
+    const ADB_CNXN = 0x4e584e43;
+    const ADB_OPEN = 0x4e45504f;
+    const ADB_OKAY = 0x59414b4f;
+    const ADB_CLSE = 0x45534c43;
+    const ADB_WRTE = 0x45545257;
+    const ADB_AUTH = 0x48545541;
+
+    const ADB_VERSION = 0x01000000;
+    const ADB_MAX_PAYLOAD = 4096;
+    const ADB_RSAPUBLICKEY = 3;
+
+    // ---- Device Connection ----
+    async function connectDevice() {
+      if (isConnected) {
+        disconnectDevice();
+        return;
+      }
+
+      const btn = document.getElementById('connectBtn');
+      const text = document.getElementById('connectText');
+      btn.disabled = true;
+      text.textContent = '连接中...';
+      setStatus('connecting', '正在连接...');
+
+      try {
+        // Request USB device
+        device = await navigator.usb.requestDevice({
+          filters: [{ classCode: 0xFF, subclass: 0x42, protocolClass: 0x01 }]
+        });
+
+        appendTerminal('info', `找到设备: ${device.productName || 'Android Device'}`);
+        appendTerminal('info', `制造商: ${device.manufacturerName || 'Unknown'}`);
+        appendTerminal('info', `VID: 0x${device.vendorId.toString(16).padStart(4, '0')} PID: 0x${device.productId.toString(16).padStart(4, '0')}`);
+
+        await device.open();
+        appendTerminal('info', '设备已打开');
+
+        // Claim interface
+        if (device.configuration.interfaces.length > 0) {
+          const iface = device.configuration.interfaces[0];
+          await device.claimInterface(iface.interfaceNumber);
+          appendTerminal('info', `已声明接口 ${iface.interfaceNumber}`);
+
+          // Start ADB handshake
+          await adbHandshake();
+        }
+
+      } catch (err) {
+        appendTerminal('error', `连接失败: ${err.message}`);
+        setStatus('disconnected', '连接失败');
+        btn.disabled = false;
+        text.textContent = '连接设备';
+      }
+    }
+
+    async function adbHandshake() {
+      try {
+        // Send CNXN message
+        const systemIdentity = 'host::webadb\0';
+        await sendAdbMessage(ADB_CNXN, ADB_VERSION, ADB_MAX_PAYLOAD, stringToBytes(systemIdentity));
+
+        // Read response
+        const response = await readAdbMessage();
+
+        if (response && response.command === ADB_CNXN) {
+          appendTerminal('info', 'ADB 连接成功！');
+          onDeviceConnected();
+        } else if (response && response.command === ADB_AUTH) {
+          appendTerminal('info', '设备要求认证，发送公钥...');
+          // Send auth key
+          const key = generateRSAKey();
+          await sendAdbMessage(ADB_AUTH, ADB_RSAPUBLICKEY, 0, key);
+          // Try again
+          const resp2 = await readAdbMessage();
+          if (resp2 && resp2.command === ADB_CNXN) {
+            appendTerminal('info', 'ADB 认证成功！');
+            onDeviceConnected();
+          }
+        }
+      } catch (err) {
+        appendTerminal('error', `ADB 握手失败: ${err.message}`);
+        setStatus('disconnected', '握手失败');
+        document.getElementById('connectBtn').disabled = false;
+        document.getElementById('connectText').textContent = '连接设备';
+      }
+    }
+
+    function onDeviceConnected() {
+      isConnected = true;
+      setStatus('connected', '已连接');
+      document.getElementById('connectBtn').disabled = false;
+      document.getElementById('connectText').textContent = '断开连接';
+      document.getElementById('connectBtn').style.background = 'linear-gradient(135deg, #ff4757, #ff6b81)';
+
+      // Load device info
+      loadDeviceInfo();
+    }
+
+    function disconnectDevice() {
+      if (device) {
+        device.close().catch(() => {});
+      }
+      device = null;
+      connection = null;
+      isConnected = false;
+      setStatus('disconnected', '未连接');
+      document.getElementById('connectText').textContent = '连接设备';
+      document.getElementById('connectBtn').style.background = 'linear-gradient(135deg, #6c63ff, #8b5cf6)';
+      appendTerminal('info', '设备已断开');
+    }
+
+    // ---- ADB Protocol Functions ----
+    async function sendAdbMessage(command, arg0, arg1, data) {
+      const dataLength = data ? data.length : 0;
+      const header = new ArrayBuffer(24);
+      const view = new DataView(header);
+
+      view.setUint32(0, command, true);
+      view.setUint32(4, arg0, true);
+      view.setUint32(8, arg1, true);
+      view.setUint32(12, dataLength, true);
+      view.setUint32(16, checksum(data), true);
+      view.setUint32(20, command ^ 0xFFFFFFFF, true);
+
+      await device.transferOut(1, header);
+      if (dataLength > 0) {
+        await device.transferOut(1, data);
+      }
+    }
+
+    async function readAdbMessage() {
+      const result = await device.transferIn(1, 24);
+      if (!result.data) return null;
+
+      const view = new DataView(result.data.buffer);
+      const command = view.getUint32(0, true);
+      const arg0 = view.getUint32(4, true);
+      const arg1 = view.getUint32(8, true);
+      const dataLength = view.getUint32(12, true);
+
+      let data = null;
+      if (dataLength > 0) {
+        const dataResult = await device.transferIn(1, dataLength);
+        data = new Uint8Array(dataResult.data.buffer);
+      }
+
+      return { command, arg0, arg1, data };
+    }
+
+    async function executeShell(command) {
+      if (!isConnected) {
+        appendTerminal('error', '错误: 设备未连接');
+        return;
+      }
+
+      appendTerminal('cmd', `$ ${command}`);
+
+      try {
+        // Open shell stream
+        const destId = Math.floor(Math.random() * 0xFFFFFF);
+        const openMsg = `shell:${command}\0`;
+        await sendAdbMessage(ADB_OPEN, destId, 0, stringToBytes(openMsg));
+
+        // Read response
+        let output = '';
+        let attempts = 0;
+        while (attempts < 50) {
+          const msg = await readAdbMessage();
+          if (!msg) break;
+
+          if (msg.command === ADB_OKAY) {
+            continue;
+          }
+
+          if (msg.command === ADB_WRTE) {
+            const text = new TextDecoder().decode(msg.data);
+            output += text;
+            // Send OKAY
+            await sendAdbMessage(ADB_OKAY, msg.arg1, msg.arg0, null);
+          }
+
+          if (msg.command === ADB_CLSE) {
+            break;
+          }
+
+          attempts++;
+        }
+
+        if (output) {
+          appendTerminal('output', output);
+        }
+      } catch (err) {
+        appendTerminal('error', `执行失败: ${err.message}`);
+      }
+    }
+
+    // ---- Utility Functions ----
+    function checksum(data) {
+      if (!data) return 0;
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) {
+        sum += data[i] & 0xFF;
+      }
+      return sum;
+    }
+
+    function stringToBytes(str) {
+      const encoder = new TextEncoder();
+      return encoder.encode(str);
+    }
+
+    function generateRSAKey() {
+      // Simplified: just send a placeholder
+      return stringToBytes('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA-placeholder-key-webadb\0');
+    }
+
+    // ---- UI Functions ----
+    function setStatus(state, text) {
+      const dot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+      dot.className = 'status-dot ' + state;
+      statusText.textContent = text;
+    }
+
+    function switchPanel(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      document.querySelector(`[data-panel="${name}"]`).classList.add('active');
+    }
+
+    function handleTerminal(event) {
+      if (event.key === 'Enter') {
+        const input = document.getElementById('terminalInput');
+        const cmd = input.value.trim();
+        if (cmd) {
+          commandHistory.unshift(cmd);
+          historyIndex = -1;
+          executeShell(cmd);
+          input.value = '';
+        }
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        if (historyIndex < commandHistory.length - 1) {
+          historyIndex++;
+          document.getElementById('terminalInput').value = commandHistory[historyIndex];
+        }
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        if (historyIndex > 0) {
+          historyIndex--;
+          document.getElementById('terminalInput').value = commandHistory[historyIndex];
+        } else {
+          historyIndex = -1;
+          document.getElementById('terminalInput').value = '';
+        }
+      }
+    }
+
+    function appendTerminal(type, text) {
+      const output = document.getElementById('terminalOutput');
+      const line = document.createElement('div');
+      line.className = type;
+      line.textContent = text;
+      output.appendChild(line);
+      output.scrollTop = output.scrollHeight;
+    }
+
+    async function loadDeviceInfo() {
+      if (!isConnected) return;
+
+      // Try to get device info via shell commands
+      const commands = {
+        'devModel': 'getprop ro.product.model',
+        'devAndroid': 'getprop ro.build.version.release',
+        'devSDK': 'getprop ro.build.version.sdk',
+        'devSecurity': 'getprop ro.build.version.security_patch',
+        'devCPU': 'getprop ro.product.cpu.abi',
+        'devScreen': 'wm size',
+        'devMem': 'cat /proc/meminfo | head -1',
+        'devBattery': 'dumpsys battery | grep level',
+        'devBuild': 'getprop ro.build.display.id',
+        'devSerial': 'getprop ro.serialno',
+        'devRoot': 'su -c echo yes || echo no',
+        'devSELinux': 'getenforce'
+      };
+
+      for (const [id, cmd] of Object.entries(commands)) {
+        try {
+          const result = await executeShellSilent(cmd);
+          document.getElementById(id).textContent = result.trim() || '-';
+        } catch {
+          document.getElementById(id).textContent = 'N/A';
+        }
+      }
+    }
+
+    async function executeShellSilent(command) {
+      if (!isConnected) return '';
+
+      try {
+        const destId = Math.floor(Math.random() * 0xFFFFFF);
+        const openMsg = `shell:${command}\0`;
+        await sendAdbMessage(ADB_OPEN, destId, 0, stringToBytes(openMsg));
+
+        let output = '';
+        let attempts = 0;
+        while (attempts < 30) {
+          const msg = await readAdbMessage();
+          if (!msg) break;
+          if (msg.command === ADB_WRTE) {
+            output += new TextDecoder().decode(msg.data);
+            await sendAdbMessage(ADB_OKAY, msg.arg1, msg.arg0, null);
+          }
+          if (msg.command === ADB_CLSE) break;
+          attempts++;
+        }
+        return output;
+      } catch {
+        return '';
+      }
+    }
+
+    // ---- File Manager ----
+    async function fileRefresh() {
+      if (!isConnected) return;
+      const path = document.getElementById('filePath').value;
+      const output = await executeShellSilent(`ls -la ${path}`);
+      parseFileList(output);
+    }
+
+    function parseFileList(output) {
+      const list = document.getElementById('fileList');
+      list.innerHTML = '';
+
+      if (!output) {
+        list.innerHTML = '<div class="file-item" style="color: var(--text2); justify-content: center;">无法读取目录</div>';
+        return;
+      }
+
+      const lines = output.split('\n').filter(l => l.trim());
+      lines.forEach(line => {
+        const parts = line.split(/\s+/);
+        if (parts.length < 7) return;
+
+        const perms = parts[0];
+        const size = parts[4];
+        const name = parts.slice(7).join(' ');
+
+        if (name === '.' || name === '..') return;
+
+        const isDir = perms.startsWith('d');
+        const icon = isDir ? '&#128193;' : (perms.includes('x') ? '&#128190;' : '&#128196;');
+
+        const item = document.createElement('div');
+        item.className = 'file-item';
+        item.innerHTML = `
+          <span class="file-icon">${icon}</span>
+          <span class="file-name">${name}</span>
+          <span class="file-size">${isDir ? '-' : formatSize(parseInt(size))}</span>
+          <span class="file-perm">${perms}</span>
+        `;
+
+        if (isDir) {
+          item.onclick = () => {
+            currentPath = document.getElementById('filePath').value + name + '/';
+            document.getElementById('filePath').value = currentPath;
+            fileRefresh();
+          };
+        }
+
+        list.appendChild(item);
+      });
+    }
+
+    function fileNavigateUp() {
+      const path = document.getElementById('filePath').value;
+      const parts = path.split('/').filter(p => p);
+      parts.pop();
+      document.getElementById('filePath').value = '/' + parts.join('/') + '/';
+      fileRefresh();
+    }
+
+    function fileUpload() {
+      if (!isConnected) return;
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          appendTerminal('info', `上传文件: ${file.name} (${formatSize(file.size)})`);
+          // WebUSB file push implementation would go here
+        }
+      };
+      input.click();
+    }
+
+    // ---- App Manager ----
+    async function refreshApps() {
+      if (!isConnected) return;
+      const output = await executeShellSilent('pm list packages -3');
+      parseAppList(output);
+    }
+
+    function parseAppList(output) {
+      const list = document.getElementById('appList');
+      list.innerHTML = '';
+
+      if (!output) {
+        list.innerHTML = '<div class="app-item" style="color: var(--text2); justify-content: center; padding: 20px;">无法获取应用列表</div>';
+        return;
+      }
+
+      const packages = output.split('\n').filter(l => l.startsWith('package:'));
+      packages.forEach(pkg => {
+        const name = pkg.replace('package:', '').trim();
+        if (!name) return;
+
+        const item = document.createElement('div');
+        item.className = 'app-item';
+        item.setAttribute('data-name', name.toLowerCase());
+        item.innerHTML = `
+          <div class="app-icon">&#128241;</div>
+          <span class="app-name">${name.split('.').pop()}</span>
+          <span class="app-package">${name}</span>
+          <button class="app-action" onclick="uninstallApp('${name}')">卸载</button>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function filterApps() {
+      const filter = document.getElementById('appFilter').value.toLowerCase();
+      document.querySelectorAll('.app-item').forEach(item => {
+        const name = item.getAttribute('data-name') || '';
+        item.style.display = name.includes(filter) ? 'flex' : 'none';
+      });
+    }
+
+    async function uninstallApp(packageName) {
+      if (!confirm(`确定要卸载 ${packageName} 吗？`)) return;
+      appendTerminal('cmd', `$ pm uninstall ${packageName}`);
+      const result = await executeShellSilent(`pm uninstall ${packageName}`);
+      appendTerminal('output', result);
+      refreshApps();
+    }
+
+    function installAPK() {
+      if (!isConnected) return;
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.apk';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          appendTerminal('info', `安装 APK: ${file.name} (${formatSize(file.size)})`);
+          // WebUSB APK install implementation would go here
+        }
+      };
+      input.click();
+    }
+
+    // ---- Screen Mirroring ----
+    async function startScrcpy() {
+      if (!isConnected) {
+        appendTerminal('error', '请先连接设备');
+        return;
+      }
+      appendTerminal('info', '屏幕投射功能需要 scrcpy server 支持');
+      appendTerminal('info', '正在尝试启动...');
+
+      try {
+        const result = await executeShellSilent('screencap -p /sdcard/screen.png');
+        appendTerminal('info', '截图已保存到设备');
+      } catch (err) {
+        appendTerminal('error', '屏幕投射启动失败');
+      }
+    }
+
+    // ---- Logcat ----
+    let logcatRunning = false;
+    let logFilter = 'all';
+
+    async function startLogcat() {
+      if (!isConnected || logcatRunning) return;
+      logcatRunning = true;
+      appendLogcat('info', '--- 开始捕获日志 ---');
+
+      try {
+        const result = await executeShellSilent('logcat -d -t 50');
+        parseLogcat(result);
+      } catch (err) {
+        appendLogcat('error', '日志捕获失败');
+      }
+    }
+
+    function parseLogcat(output) {
+      if (!output) return;
+      const lines = output.split('\n');
+      lines.forEach(line => {
+        if (!line.trim()) return;
+
+        let level = 'info';
+        if (line.includes(' V/')) level = 'verbose';
+        else if (line.includes(' D/')) level = 'debug';
+        else if (line.includes(' I/')) level = 'info';
+        else if (line.includes(' W/')) level = 'warn';
+        else if (line.includes(' E/')) level = 'error';
+
+        if (logFilter === 'all' || logFilter === level) {
+          appendLogcat(level, line);
+        }
+      });
+    }
+
+    function appendLogcat(level, text) {
+      const output = document.getElementById('logcatOutput');
+      const line = document.createElement('div');
+      line.className = 'log-' + level;
+      line.textContent = text;
+      output.appendChild(line);
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function setLogFilter(filter, el) {
+      logFilter = filter;
+      document.querySelectorAll('.logcat-filter').forEach(f => f.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // ---- Helpers ----
+    function formatSize(bytes) {
+      if (isNaN(bytes)) return '-';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+      return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+    }
+
+    // ---- Keyboard Shortcuts ----
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'l') {
+        e.preventDefault();
+        document.getElementById('terminalOutput').innerHTML = '';
+      }
+    });
+
+    // ---- Auto-detect USB ----
+    if (navigator.usb) {
+      navigator.usb.addEventListener('connect', () => {
+        appendTerminal('info', '检测到 USB 设备插入');
+      });
+      navigator.usb.addEventListener('disconnect', () => {
+        if (isConnected) {
+          disconnectDevice();
+          appendTerminal('error', 'USB 设备已断开');
+        }
+      });
+    } else {
+      appendTerminal('error', '当前浏览器不支持 WebUSB，请使用 Chrome 或 Edge');
+    }
+  </script>
+</body>
+</html>
