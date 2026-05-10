@@ -523,6 +523,275 @@
     .log-warn { color: #ffa726; }
     .log-error { color: #ef5350; }
 
+    /* Network Debug */
+    .net-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .net-section h3 {
+      font-size: 16px;
+      color: var(--accent);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .net-form {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .net-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .net-field label {
+      font-size: 12px;
+      color: var(--text2);
+      font-weight: 500;
+    }
+
+    .net-field input, .net-field select {
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .net-field input:focus, .net-field select:focus {
+      border-color: var(--accent);
+    }
+
+    .net-field input::placeholder {
+      color: var(--text2);
+      opacity: 0.6;
+    }
+
+    .net-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .net-btn-pair {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white;
+    }
+
+    .net-btn-pair:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+    }
+
+    .net-btn-connect {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+    }
+
+    .net-btn-connect:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.4);
+    }
+
+    .net-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .net-log {
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      font-family: 'Fira Code', monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 16px;
+    }
+
+    .net-log .log-time { color: var(--text2); margin-right: 8px; }
+    .net-log .log-ok { color: var(--success); }
+    .net-log .log-err { color: var(--danger); }
+    .net-log .log-warn { color: var(--warning); }
+    .net-log .log-info { color: var(--accent); }
+
+    .net-devices {
+      margin-top: 16px;
+    }
+
+    .net-device-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+
+    .net-device-item:hover {
+      border-color: var(--accent);
+    }
+
+    .net-device-icon {
+      font-size: 20px;
+      margin-right: 12px;
+    }
+
+    .net-device-info {
+      flex: 1;
+    }
+
+    .net-device-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .net-device-addr {
+      font-size: 12px;
+      color: var(--text2);
+      font-family: monospace;
+    }
+
+    .net-device-status {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .net-device-status.paired {
+      background: rgba(46, 213, 115, 0.15);
+      color: var(--success);
+    }
+
+    .net-device-status.connected {
+      background: rgba(108, 99, 255, 0.15);
+      color: var(--accent);
+    }
+
+    .net-device-status.offline {
+      background: rgba(136, 136, 136, 0.15);
+      color: var(--text2);
+    }
+
+    .net-device-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .net-device-actions button {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .net-device-actions button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .net-device-actions button.btn-danger:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .pairing-code-display {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 16px 0;
+    }
+
+    .pairing-digit {
+      width: 48px;
+      height: 56px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: monospace;
+    }
+
+    .pairing-digit.filled {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, 0.1);
+    }
+
+    .tab-group {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .sidebar { width: 60px; }
@@ -530,6 +799,9 @@
       .sidebar-item { justify-content: center; padding: 12px; }
       .main { flex-direction: column; }
       .content { padding: 12px; }
+      .net-form { flex-direction: column; }
+      .net-field { width: 100%; }
+      .net-field input, .net-field select { width: 100%; }
     }
   </style>
 </head>
@@ -550,9 +822,9 @@
   <div class="status-bar">
     <span class="status-dot disconnected" id="statusDot"></span>
     <span id="statusText">未连接</span>
-    <span style="margin-left: auto; color: var(--text2);">
-      WebUSB + ADB Protocol | Powered by 0tah-mitos
-    </span>
+      <span style="margin-left: auto; color: var(--text2);">
+        WebUSB + WebSocket + ADB Protocol | Powered by 0tah-mitos
+      </span>
   </div>
 
   <!-- Main -->
@@ -582,6 +854,10 @@
       <div class="sidebar-item" onclick="switchPanel('screen')" data-panel="screen">
         <span class="sidebar-icon">&#127909;</span>
         <span>屏幕投射</span>
+      </div>
+      <div class="sidebar-item" onclick="switchPanel('network')" data-panel="network">
+        <span class="sidebar-icon">&#128225;</span>
+        <span>网络调试</span>
       </div>
       <div class="sidebar-item" onclick="switchPanel('logcat')" data-panel="logcat">
         <span class="sidebar-icon">&#128220;</span>
@@ -728,8 +1004,105 @@
         </div>
       </div>
 
+      <!-- Network Debug Panel -->
+      <div class="panel" id="panel-network">
+        <h2 style="margin-bottom: 20px;">&#128225; ADB 网络调试</h2>
+
+        <!-- Tab Switcher -->
+        <div class="tab-group">
+          <button class="tab-btn active" onclick="switchNetTab('pair', this)">&#128273; 无线配对</button>
+          <button class="tab-btn" onclick="switchNetTab('connect', this)">&#128279; 连接设备</button>
+          <button class="tab-btn" onclick="switchNetTab('devices', this)">&#128241; 已配对设备</button>
+        </div>
+
+        <!-- Pairing Tab -->
+        <div class="tab-content active" id="netTab-pair">
+          <div class="net-section">
+            <h3>&#128273; 无线配对（Android 11+）</h3>
+            <p style="color: var(--text2); font-size: 13px; margin-bottom: 16px;">
+              在手机上：设置 → 开发者选项 → 无线调试 → 使用配对码配对设备<br>
+              然后输入手机上显示的配对码和配对端口号
+            </p>
+            <div class="net-form">
+              <div class="net-field">
+                <label>设备 IP 地址</label>
+                <input type="text" id="pairIP" placeholder="192.168.1.100" style="width: 180px;">
+              </div>
+              <div class="net-field">
+                <label>配对端口</label>
+                <input type="number" id="pairPort" placeholder="37653" min="1" max="65535" style="width: 120px;">
+              </div>
+              <div class="net-field">
+                <label>配对码</label>
+                <input type="text" id="pairCode" placeholder="123456" maxlength="6" style="width: 120px;">
+              </div>
+              <button class="net-btn net-btn-pair" id="pairBtn" onclick="adbPair()">&#128273; 配对</button>
+            </div>
+
+            <!-- Pairing Code Visual Display -->
+            <div id="pairingDisplay" style="display:none; text-align:center; margin-top: 20px;">
+              <p style="color: var(--text2); font-size: 12px;">手机上显示的配对码</p>
+              <div class="pairing-code-display" id="pairingCodeDigits"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connect Tab -->
+        <div class="tab-content" id="netTab-connect">
+          <div class="net-section">
+            <h3>&#128279; 连接 ADB 设备</h3>
+            <p style="color: var(--text2); font-size: 13px; margin-bottom: 16px;">
+              配对成功后，使用连接端口（不是配对端口）连接设备<br>
+              在手机「无线调试」页面查看 IP 地址和端口
+            </p>
+            <div class="net-form">
+              <div class="net-field">
+                <label>设备 IP 地址</label>
+                <input type="text" id="connectIP" placeholder="192.168.1.100" style="width: 180px;">
+              </div>
+              <div class="net-field">
+                <label>连接端口</label>
+                <input type="number" id="connectPort" placeholder="5555" min="1" max="65535" style="width: 120px;">
+              </div>
+              <button class="net-btn net-btn-connect" id="netConnectBtn" onclick="adbNetConnect()">&#128279; 连接</button>
+            </div>
+
+            <!-- Quick Connect History -->
+            <div id="connectHistory" style="margin-top: 16px;">
+              <p style="color: var(--text2); font-size: 12px;">&#128337; 最近连接</p>
+              <div id="historyList"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Devices Tab -->
+        <div class="tab-content" id="netTab-devices">
+          <div class="net-section">
+            <h3>&#128241; 已配对设备</h3>
+            <p style="color: var(--text2); font-size: 13px; margin-bottom: 16px;">
+              管理已配对和已连接的 ADB 网络设备
+            </p>
+            <div class="net-devices" id="netDeviceList">
+              <div style="text-align: center; color: var(--text2); padding: 30px;">
+                暂无已配对设备
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Network Debug Log -->
+        <div class="net-section" style="margin-top: 16px;">
+          <h3>&#128220; 连接日志</h3>
+          <div class="net-log" id="netLog">
+<span class="log-info">WebADB 网络调试已就绪</span>
+<span class="log-warn">提示：浏览器无法直接建立 TCP 连接，需要本地运行 ADB Bridge 代理</span>
+<span class="log-info">启动方式：node bridge.js --port 15555</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Logcat Panel -->
-      <div class="panel" id="panel-logcat">
+        <div class="panel" id="panel-logcat">
         <h2 style="margin-bottom: 20px;">&#128220; Logcat 日志</h2>
         <div class="logcat-filters">
           <span class="logcat-filter active" onclick="setLogFilter('all', this)">全部</span>
@@ -754,9 +1127,17 @@
     let device = null;
     let connection = null;
     let isConnected = false;
+    let connectionType = null; // 'usb' | 'network'
+    let wsConnection = null; // WebSocket for network ADB
+    let netPairedDevices = []; // paired device list
+    let connectHistoryList = []; // connection history
     let currentPath = '/sdcard/';
     let commandHistory = [];
     let historyIndex = -1;
+
+    // ---- ADB Bridge Settings ----
+    const ADB_BRIDGE_DEFAULT_PORT = 15555;
+    let adbBridgeUrl = `ws://localhost:${ADB_BRIDGE_DEFAULT_PORT}`;
 
     // ---- ADB Protocol Constants ----
     const ADB_CNXN = 0x4e584e43;
@@ -858,16 +1239,38 @@
     }
 
     function disconnectDevice() {
-      if (device) {
+      // Close USB
+      if (device && connectionType === 'usb') {
         device.close().catch(() => {});
       }
       device = null;
+
+      // Close network
+      if (connectionType === 'network' && wsConnection) {
+        try {
+          const disconnectCmd = JSON.stringify({
+            action: 'disconnect',
+            ip: document.getElementById('connectIP').value,
+            port: parseInt(document.getElementById('connectPort').value)
+          });
+          wsConnection.send(disconnectCmd);
+        } catch {}
+      }
+
       connection = null;
       isConnected = false;
+      connectionType = null;
       setStatus('disconnected', '未连接');
       document.getElementById('connectText').textContent = '连接设备';
       document.getElementById('connectBtn').style.background = 'linear-gradient(135deg, #6c63ff, #8b5cf6)';
       appendTerminal('info', '设备已断开');
+
+      // Reset network UI
+      const netConnectBtn = document.getElementById('netConnectBtn');
+      if (netConnectBtn) {
+        netConnectBtn.innerHTML = '&#128279; 连接';
+        netConnectBtn.disabled = false;
+      }
     }
 
     // ---- ADB Protocol Functions ----
@@ -915,6 +1318,12 @@
       }
 
       appendTerminal('cmd', `$ ${command}`);
+
+      // Route to network or USB based on connection type
+      if (connectionType === 'network') {
+        await executeShellNetwork(command);
+        return;
+      }
 
       try {
         // Open shell stream
@@ -1059,6 +1468,17 @@
     async function executeShellSilent(command) {
       if (!isConnected) return '';
 
+      // Network mode
+      if (connectionType === 'network') {
+        try {
+          if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) return '';
+          const shellCmd = JSON.stringify({ action: 'shell', command });
+          wsConnection.send(shellCmd);
+          return ''; // async, result comes via onmessage
+        } catch { return ''; }
+      }
+
+      // USB mode
       try {
         const destId = Math.floor(Math.random() * 0xFFFFFF);
         const openMsg = `shell:${command}\0`;
@@ -1298,6 +1718,365 @@
       return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
     }
 
+    // ---- Network ADB Functions ----
+
+    function switchNetTab(tab, el) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('netTab-' + tab).classList.add('active');
+      el.classList.add('active');
+    }
+
+    function appendNetLog(type, text) {
+      const log = document.getElementById('netLog');
+      const line = document.createElement('div');
+      const time = new Date().toLocaleTimeString();
+      line.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-${type}">${text}</span>`;
+      log.appendChild(line);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // ---- ADB Pairing (Wireless Debugging) ----
+    async function adbPair() {
+      const ip = document.getElementById('pairIP').value.trim();
+      const port = document.getElementById('pairPort').value.trim();
+      const code = document.getElementById('pairCode').value.trim();
+
+      if (!ip || !port || !code) {
+        appendNetLog('err', '请填写完整的 IP、配对端口和配对码');
+        return;
+      }
+
+      if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+        appendNetLog('err', '配对码必须是 6 位数字');
+        return;
+      }
+
+      const pairBtn = document.getElementById('pairBtn');
+      pairBtn.disabled = true;
+      pairBtn.innerHTML = '&#8987; 配对中...';
+
+      // Show pairing code visually
+      showPairingCode(code);
+
+      appendNetLog('info', `正在配对 ${ip}:${port}，配对码: ${code}`);
+
+      try {
+        // Connect to ADB Bridge
+        const ws = await connectToBridge();
+
+        // Send pair command to bridge
+        const pairCmd = JSON.stringify({
+          action: 'pair',
+          ip: ip,
+          port: parseInt(port),
+          code: code
+        });
+
+        ws.send(pairCmd);
+        appendNetLog('info', '已发送配对请求到 ADB Bridge...');
+
+      } catch (err) {
+        appendNetLog('err', `配对失败: ${err.message}`);
+        appendNetLog('warn', '请确保本地已运行 ADB Bridge（node bridge.js）');
+        pairBtn.disabled = false;
+        pairBtn.innerHTML = '&#128273; 配对';
+      }
+    }
+
+    function showPairingCode(code) {
+      const display = document.getElementById('pairingDisplay');
+      const digits = document.getElementById('pairingCodeDigits');
+      display.style.display = 'block';
+      digits.innerHTML = '';
+
+      for (let i = 0; i < 6; i++) {
+        const digit = document.createElement('div');
+        digit.className = 'pairing-digit filled';
+        digit.textContent = code[i] || '';
+        digits.appendChild(digit);
+      }
+    }
+
+    // ---- ADB Network Connect ----
+    async function adbNetConnect() {
+      const ip = document.getElementById('connectIP').value.trim();
+      const port = document.getElementById('connectPort').value.trim();
+
+      if (!ip || !port) {
+        appendNetLog('err', '请填写完整的 IP 和端口');
+        return;
+      }
+
+      const connectBtn = document.getElementById('netConnectBtn');
+      connectBtn.disabled = true;
+      connectBtn.innerHTML = '&#8987; 连接中...';
+
+      setStatus('connecting', `正在连接 ${ip}:${port}...`);
+      appendNetLog('info', `正在连接 ${ip}:${port}...`);
+
+      try {
+        // Connect to ADB Bridge
+        const ws = await connectToBridge();
+
+        // Send connect command
+        const connectCmd = JSON.stringify({
+          action: 'connect',
+          ip: ip,
+          port: parseInt(port)
+        });
+
+        ws.send(connectCmd);
+        appendNetLog('info', '已发送连接请求到 ADB Bridge...');
+
+        // Save to history
+        saveConnectHistory(ip, port);
+
+      } catch (err) {
+        appendNetLog('err', `连接失败: ${err.message}`);
+        appendNetLog('warn', '请确保本地已运行 ADB Bridge（node bridge.js）');
+        setStatus('disconnected', '连接失败');
+        connectBtn.disabled = false;
+        connectBtn.innerHTML = '&#128279; 连接';
+      }
+    }
+
+    // ---- ADB Bridge WebSocket ----
+    function connectToBridge() {
+      return new Promise((resolve, reject) => {
+        if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
+          resolve(wsConnection);
+          return;
+        }
+
+        appendNetLog('info', `正在连接 ADB Bridge: ${adbBridgeUrl}`);
+
+        const ws = new WebSocket(adbBridgeUrl);
+        let resolved = false;
+
+        ws.onopen = () => {
+          appendNetLog('ok', '已连接到 ADB Bridge');
+          wsConnection = ws;
+          resolved = true;
+          resolve(ws);
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            handleBridgeMessage(data);
+          } catch {
+            // Raw data - forward to terminal if connected
+            if (isConnected && connectionType === 'network') {
+              appendTerminal('output', event.data);
+            }
+          }
+        };
+
+        ws.onerror = (err) => {
+          appendNetLog('err', 'ADB Bridge 连接失败');
+          if (!resolved) {
+            reject(new Error('无法连接到 ADB Bridge'));
+          }
+        };
+
+        ws.onclose = () => {
+          appendNetLog('warn', 'ADB Bridge 连接已断开');
+          wsConnection = null;
+          if (isConnected && connectionType === 'network') {
+            disconnectDevice();
+          }
+        };
+
+        setTimeout(() => {
+          if (!resolved) {
+            ws.close();
+            reject(new Error('ADB Bridge 连接超时'));
+          }
+        }, 5000);
+      });
+    }
+
+    function handleBridgeMessage(data) {
+      switch (data.type) {
+        case 'pair_result':
+          if (data.success) {
+            appendNetLog('ok', `配对成功！设备 ${data.ip}:${data.port}`);
+            addPairedDevice(data.ip, data.port, data.deviceName || 'Unknown');
+          } else {
+            appendNetLog('err', `配对失败: ${data.error || '未知错误'}`);
+          }
+          document.getElementById('pairBtn').disabled = false;
+          document.getElementById('pairBtn').innerHTML = '&#128273; 配对';
+          break;
+
+        case 'connect_result':
+          if (data.success) {
+            appendNetLog('ok', `连接成功！设备 ${data.ip}:${data.port}`);
+            connectionType = 'network';
+            isConnected = true;
+            setStatus('connected', `已连接 ${data.ip}:${data.port}`);
+            document.getElementById('connectBtn').innerHTML = '断开连接';
+            document.getElementById('connectBtn').style.background = 'linear-gradient(135deg, #ff4757, #ff6b81)';
+            document.getElementById('netConnectBtn').innerHTML = '&#9989; 已连接';
+            document.getElementById('netConnectBtn').disabled = false;
+            updateDeviceInList(data.ip, data.port, 'connected');
+            loadDeviceInfo();
+          } else {
+            appendNetLog('err', `连接失败: ${data.error || '未知错误'}`);
+            setStatus('disconnected', '连接失败');
+            document.getElementById('netConnectBtn').disabled = false;
+            document.getElementById('netConnectBtn').innerHTML = '&#128279; 连接';
+          }
+          break;
+
+        case 'shell_output':
+          if (data.output) {
+            appendTerminal('output', data.output);
+          }
+          break;
+
+        case 'device_list':
+          if (data.devices) {
+            data.devices.forEach(d => {
+              addPairedDevice(d.ip, d.port, d.name || 'Unknown');
+            });
+          }
+          break;
+
+        case 'disconnect_result':
+          appendNetLog('info', `设备已断开: ${data.ip}:${data.port}`);
+          break;
+
+        case 'error':
+          appendNetLog('err', `Bridge 错误: ${data.message}`);
+          break;
+
+        default:
+          appendNetLog('info', `Bridge 消息: ${JSON.stringify(data)}`);
+      }
+    }
+
+    // ---- Paired Device Management ----
+    function addPairedDevice(ip, port, name) {
+      const existing = netPairedDevices.find(d => d.ip === ip && d.port === port);
+      if (existing) {
+        existing.status = 'paired';
+        renderDeviceList();
+        return;
+      }
+
+      netPairedDevices.push({
+        ip: ip,
+        port: port,
+        name: name,
+        status: 'paired',
+        pairedAt: new Date().toLocaleString()
+      });
+
+      renderDeviceList();
+    }
+
+    function updateDeviceInList(ip, port, status) {
+      const dev = netPairedDevices.find(d => d.ip === ip && d.port === port);
+      if (dev) {
+        dev.status = status;
+        renderDeviceList();
+      }
+    }
+
+    function removePairedDevice(ip, port) {
+      netPairedDevices = netPairedDevices.filter(d => !(d.ip === ip && d.port === port));
+      renderDeviceList();
+    }
+
+    function renderDeviceList() {
+      const list = document.getElementById('netDeviceList');
+
+      if (netPairedDevices.length === 0) {
+        list.innerHTML = '<div style="text-align: center; color: var(--text2); padding: 30px;">暂无已配对设备</div>';
+        return;
+      }
+
+      list.innerHTML = '';
+      netPairedDevices.forEach(dev => {
+        const statusClass = dev.status === 'connected' ? 'connected' : 'paired';
+        const statusText = dev.status === 'connected' ? '已连接' : '已配对';
+
+        const item = document.createElement('div');
+        item.className = 'net-device-item';
+        item.innerHTML = `
+          <span class="net-device-icon">&#128241;</span>
+          <div class="net-device-info">
+            <div class="net-device-name">${dev.name}</div>
+            <div class="net-device-addr">${dev.ip}:${dev.port} | 配对于 ${dev.pairedAt}</div>
+          </div>
+          <span class="net-device-status ${statusClass}">${statusText}</span>
+          <div class="net-device-actions">
+            <button onclick="quickConnect('${dev.ip}', '${dev.port}')" ${dev.status === 'connected' ? 'disabled' : ''}>连接</button>
+            <button class="btn-danger" onclick="removePairedDevice('${dev.ip}', '${dev.port}')">移除</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function quickConnect(ip, port) {
+      document.getElementById('connectIP').value = ip;
+      document.getElementById('connectPort').value = port;
+      switchNetTab('connect', document.querySelectorAll('.tab-btn')[1]);
+      adbNetConnect();
+    }
+
+    // ---- Connection History ----
+    function saveConnectHistory(ip, port) {
+      connectHistoryList = connectHistoryList.filter(h => !(h.ip === ip && h.port === port));
+      connectHistoryList.unshift({ ip, port, time: new Date().toLocaleString() });
+      connectHistoryList = connectHistoryList.slice(0, 5); // Keep top 5
+      renderConnectHistory();
+    }
+
+    function renderConnectHistory() {
+      const list = document.getElementById('historyList');
+      if (connectHistoryList.length === 0) {
+        list.innerHTML = '<span style="color: var(--text2); font-size: 12px;">暂无连接记录</span>';
+        return;
+      }
+
+      list.innerHTML = '';
+      connectHistoryList.forEach(h => {
+        const item = document.createElement('div');
+        item.className = 'net-device-item';
+        item.style.marginTop = '6px';
+        item.innerHTML = `
+          <span class="net-device-icon">&#128337;</span>
+          <div class="net-device-info">
+            <div class="net-device-name" style="font-family: monospace;">${h.ip}:${h.port}</div>
+            <div class="net-device-addr">${h.time}</div>
+          </div>
+          <div class="net-device-actions">
+            <button onclick="quickConnect('${h.ip}', '${h.port}')">连接</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    // ---- Network Shell Execution ----
+    async function executeShellNetwork(command) {
+      if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
+        appendTerminal('error', 'ADB Bridge 未连接');
+        return;
+      }
+
+      const shellCmd = JSON.stringify({
+        action: 'shell',
+        command: command
+      });
+
+      wsConnection.send(shellCmd);
+    }
+
     // ---- Keyboard Shortcuts ----
     document.addEventListener('keydown', (e) => {
       if (e.ctrlKey && e.key === 'l') {
@@ -1312,7 +2091,7 @@
         appendTerminal('info', '检测到 USB 设备插入');
       });
       navigator.usb.addEventListener('disconnect', () => {
-        if (isConnected) {
+        if (isConnected && connectionType === 'usb') {
           disconnectDevice();
           appendTerminal('error', 'USB 设备已断开');
         }
@@ -1320,6 +2099,9 @@
     } else {
       appendTerminal('error', '当前浏览器不支持 WebUSB，请使用 Chrome 或 Edge');
     }
+
+    // ---- Init ----
+    renderConnectHistory();
   </script>
 </body>
 </html>
